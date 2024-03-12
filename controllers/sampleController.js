@@ -18,6 +18,7 @@ exports.createSample = catchAsyncError(async (req, res, next) => {
         //create new user
         //user = await ...
     }
+    else user = user[0];
     const sample = await Sample.create({
         userId: user._id,
         adminId: req.user.role === "Admin" ? req.user._id : req.user.adminId,
@@ -32,7 +33,7 @@ exports.createSample = catchAsyncError(async (req, res, next) => {
 });
 
 exports.findAllSample = catchAsyncError(async (req, res, next) => {
-    const resultsPerPage = 2;
+    const resultsPerPage = 8;
     const { name, status } = req.query;
     const sample = await Sample.aggregate([
         {
@@ -49,6 +50,23 @@ exports.findAllSample = catchAsyncError(async (req, res, next) => {
                     name ? { "user.name": name } : {},
                     status ? { "status": status } : {},
                 ]
+            }
+        },
+        {
+            $facet: {
+                data: [{ $skip: (resultsPerPage) * (page - 1) }, { $limit: resultsPerPage }],
+                metaData: [{ $count: "total" }],
+            }
+        }
+    ])
+    res.status(200).json({ sample });
+});
+exports.findUserSample = catchAsyncError(async (req, res, next) => {
+    const resultsPerPage = 8;
+    const sample = await Sample.aggregate([
+        {
+            $match: {
+                userId: req.params.id
             }
         },
         {
