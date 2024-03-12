@@ -3,7 +3,6 @@ const User = require("../models/User")
 
 
 exports.registerUser = catchAsyncErrors(async(req,res,next)=>{
-
 })
 
 exports.login = catchAsyncErrors(async(req,res,next)=>{
@@ -25,6 +24,17 @@ exports.updateProfile = catchAsyncErrors(async(req,res,next)=>{
 exports.getUserDetails = catchAsyncErrors(async(req,res,next)=>{
 
 })
+
+
+exports.getAllUsers = catchAsyncErrors(async(req,res,next)=>{
+
+})
+
+
+exports.getSingleUser = catchAsyncErrors(async(req,res,next)=>{
+
+})
+
 
 exports.deleteUser = catchAsyncErrors(async(req,res,next)=>{
 
