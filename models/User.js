@@ -42,6 +42,19 @@ const userSchema = new mongoose.Schema({
     adminId:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"User"
+    },
+    department:{
+        type:String,
+    },
+    compliment:{
+        type:String,
+    },
+    referralType:{
+        type:String,
+        enum:{
+            values:["Doctor","Hospital"],
+            message:`{VALUE} is not a valid`,
+        },
     }
 },{
     timestamps:true,
