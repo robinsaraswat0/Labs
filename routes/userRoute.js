@@ -11,3 +11,5 @@ router.route("/admin/updateProfile").put(updateProfile)
 router.route("/admin/getAllUsers").get(getAllUsers)
 router.route("/admin/getSingleUser").get(getSingleUser)
 router.route("/admin/deleteUser").post(deleteUser)
+
+module.exports = router
