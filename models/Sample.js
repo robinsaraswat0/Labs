@@ -4,7 +4,7 @@ const sampleSchema = new mongoose.Schema({
     user:{
         required:true
     },
-    collector:{
+    collectorId:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"User",
         required:true

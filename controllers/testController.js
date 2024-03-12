@@ -7,6 +7,29 @@ exports.createTest = catchAsyncError(async (req, res, next) => {
     res.status(200).json({ test });
 });
 
+exports.findAllTest = catchAsyncError(async (req, res, next) => {
+    const resultsPerPage = 2;
+    const { department, name, testCode } = req.query;
+    const test = await Test.aggregate([
+        {
+            $match: {
+                $and: [
+                    department ? { "department": department } : {},
+                    name ? { "name": name } : {},
+                    testCode ? { "testCode": testCode } : {},
+                ]
+            }
+        },
+        {
+            $facet: {
+                data: [{ $skip: (resultsPerPage) * (page - 1) }, { $limit: resultsPerPage }],
+                metaData: [{ $count: "total" }],
+            }
+        }
+    ])
+    res.status(200).json({ test });
+});
+
 exports.deleteTest = catchAsyncError(async (req, res, next) => {
     let test = await Test.findOne({ _id: req.params.id });
     if (!test) {
