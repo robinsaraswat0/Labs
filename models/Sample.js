@@ -23,7 +23,7 @@ const sampleSchema = new mongoose.Schema({
     }],
     orgId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Organisation",
+        ref: "User",
         required: true
     },
     place: {

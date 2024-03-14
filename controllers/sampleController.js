@@ -16,7 +16,11 @@ exports.createSample = catchAsyncError(async (req, res, next) => {
     ])
     if (user.length == 0) {
         //create new user
-        //user = await ...
+        if (req.user) {
+            req.body[adminId] = req.user.role === "Admin" ? req.user._id : req.user.adminId
+        }
+
+        user = await User.create(req.body)
     }
     else user = user[0];
     const sample = await Sample.create({
@@ -33,6 +37,9 @@ exports.createSample = catchAsyncError(async (req, res, next) => {
 });
 
 exports.findAllSample = catchAsyncError(async (req, res, next) => {
+    if (req.user.role == "User" || req.user.role === "Collector") {
+        return res.json("You are not authorized !")
+    }
     const resultsPerPage = 8;
     const { name, status } = req.query;
     const sample = await Sample.aggregate([
@@ -47,6 +54,7 @@ exports.findAllSample = catchAsyncError(async (req, res, next) => {
         {
             $match: {
                 $and: [
+                    { adminId: req.user.role === "Admin" ? req.user._id : req.user.adminId },
                     name ? { "user.name": name } : {},
                     status ? { "status": status } : {},
                 ]
@@ -80,18 +88,30 @@ exports.findUserSample = catchAsyncError(async (req, res, next) => {
 });
 
 exports.deleteSample = catchAsyncError(async (req, res, next) => {
+    if (req.user.role == "User" || req.user.role === "Collector") {
+        return res.json("You are not authorized !")
+    }
     let sample = await Sample.findOne({ _id: req.params.id });
     if (!sample) {
         return next(new ErrorHandler("Sample not Found", 404));
+    }
+    if (sample.adminId.toString() != req.user.role === "Admin" ? req.user._id.toString() : req.user.adminId.toString()) {
+        return res.json("You are not authorized !")
     }
     await Sample.findByIdAndDelete(req.params.id);
     res.status(200).json({ message: "Deleted Successfully!" });
 });
 
 exports.updateSample = catchAsyncError(async (req, res, next) => {
+    if (req.user.role == "User" || req.user.role === "Members") {
+        return res.json("You are not authorized !")
+    }
     let sample = await Sample.findOne({ _id: req.params.id });
     if (!sample) {
         return next(new ErrorHandler("Sample not Found", 404));
+    }
+    if (sample.adminId.toString() != req.user.role === "Admin" ? req.user._id.toString() : req.user.adminId.toString()) {
+        return res.json("You are not authorized !")
     }
     await Sample.findByIdAndUpdate(req.params.id, {
         user: req.body.user,

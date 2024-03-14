@@ -2,12 +2,15 @@ const catchAsyncError = require('../middleware/catchAsyncErrors')
 const Test = require('../models/Test')
 
 
-exports.createTest = catchAsyncError(async (req, res, next) => {
-    const test = await Test.create(req.body);
-    res.status(200).json({ test });
-});
+// exports.createTest = catchAsyncError(async (req, res, next) => {
+//     const test = await Test.create(req.body);
+//     res.status(200).json({ test });
+// });
 
 exports.findAllTest = catchAsyncError(async (req, res, next) => {
+    if (req.user.role == "User" || req.user.role === "Collector") {
+        return res.json("You are not authorized !")
+    }
     const resultsPerPage = 2;
     const { department, name, testCode } = req.query;
     const test = await Test.aggregate([
@@ -31,6 +34,9 @@ exports.findAllTest = catchAsyncError(async (req, res, next) => {
 });
 
 exports.deleteTest = catchAsyncError(async (req, res, next) => {
+    if (req.user.role == "User" || req.user.role === "Collector") {
+        return res.json("You are not authorized !")
+    }
     let test = await Test.findOne({ _id: req.params.id });
     if (!test) {
         return next(new ErrorHandler("Test not Found", 404));
@@ -40,6 +46,9 @@ exports.deleteTest = catchAsyncError(async (req, res, next) => {
 });
 
 exports.updateTest = catchAsyncError(async (req, res, next) => {
+    if (req.user.role == "User" || req.user.role === "Collector") {
+        return res.json("You are not authorized !")
+    }
     let test = await Test.findOne({ _id: req.params.id });
     if (!test) {
         return next(new ErrorHandler("Test not Found", 404));
